@@ -1189,40 +1189,66 @@
 
         // 모바일 좌우 스와이프로 날짜 이동
         (function setupSwipe() {
-            const swipeArea = document.querySelector('main.content-container');
-            if (!swipeArea) return;
+            const chipContainer = document.querySelector('.chip-container');
 
             let startX = 0;
             let startY = 0;
+            let lastX = 0;
+            let lastY = 0;
             let tracking = false;
+            let swiped = false; // 이번 제스처가 스와이프로 판정되면 click 무시
 
-            const THRESHOLD = 50; // 최소 이동 거리(px)
+            const THRESHOLD = 40; // 최소 이동 거리(px)
             const RATIO = 1.2;    // 수평이 수직보다 이만큼 더 커야 스와이프로 인정
 
-            swipeArea.addEventListener('touchstart', (e) => {
+            document.addEventListener('touchstart', (e) => {
                 if (e.touches.length !== 1) { tracking = false; return; }
+                // 칩(가로 스크롤) 위에서 시작한 터치는 무시
+                if (chipContainer && chipContainer.contains(e.target)) { tracking = false; return; }
                 const t = e.touches[0];
-                startX = t.clientX;
-                startY = t.clientY;
+                startX = lastX = t.clientX;
+                startY = lastY = t.clientY;
                 tracking = true;
+                swiped = false;
             }, { passive: true });
 
-            swipeArea.addEventListener('touchend', (e) => {
+            document.addEventListener('touchmove', (e) => {
+                if (!tracking || e.touches.length !== 1) return;
+                const t = e.touches[0];
+                lastX = t.clientX;
+                lastY = t.clientY;
+            }, { passive: true });
+
+            const finish = (clientX, clientY) => {
                 if (!tracking) return;
                 tracking = false;
-                const t = e.changedTouches[0];
-                const dx = t.clientX - startX;
-                const dy = t.clientY - startY;
+                const dx = (clientX ?? lastX) - startX;
+                const dy = (clientY ?? lastY) - startY;
                 if (Math.abs(dx) < THRESHOLD) return;
                 if (Math.abs(dx) < Math.abs(dy) * RATIO) return; // 세로 스크롤로 판단
+                swiped = true;
                 if (dx < 0) {
                     switchDay(currentDay + 1); // 왼쪽으로 스와이프 → 다음 날
                 } else {
                     switchDay(currentDay - 1); // 오른쪽으로 스와이프 → 이전 날
                 }
+            };
+
+            document.addEventListener('touchend', (e) => {
+                const t = e.changedTouches[0];
+                finish(t ? t.clientX : undefined, t ? t.clientY : undefined);
             }, { passive: true });
 
-            swipeArea.addEventListener('touchcancel', () => { tracking = false; }, { passive: true });
+            document.addEventListener('touchcancel', () => { tracking = false; }, { passive: true });
+
+            // 스와이프로 판정되면 카드(anchor) 클릭이 따라 발생하지 않게 차단
+            document.addEventListener('click', (e) => {
+                if (swiped) {
+                    swiped = false;
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
         })();
 
         // 데스크톱 좌우 화살표 키로 날짜 전환
