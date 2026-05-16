@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>이탈리아 14박 15일 가족 여행</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #222222;
+            padding-bottom: 40px;
+        }
+        header {
+            background-color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #e0e0e0;
+            padding-top: 16px;
+        }
+        .header-title {
+            font-size: 16px;
+            text-align: center;
+            color: #222222;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .chip-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0 16px 12px 16px;
+            scrollbar-width: none;
+        }
+        .chip-container::-webkit-scrollbar {
+            display: none;
+        }
+        .chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            margin-right: 8px;
+            font-size: 13px;
+            color: #717171;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            min-width: 64px;
+        }
+        .chip-date {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .chip-city {
+            font-size: 11px;
+            margin-top: 2px;
+        }
+        .chip.active {
+            background-color: #222222;
+            color: #ffffff;
+            border-color: #222222;
+        }
+        .content-container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .day-section {
+            display: none;
+        }
+        .day-section.active {
+            display: block;
+        }
+        .day-summary {
+            font-size: 14px;
+            color: #717171;
+            margin-bottom: 16px;
+            padding-left: 4px;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background-color: #e0e0e0;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #b0b0b0;
+            border: 2px solid #f7f7f7;
+        }
+        .timeline-item.destination .timeline-dot {
+            background-color: #ff385c;
+            width: 12px;
+            height: 12px;
+            left: -21px;
+            top: 6px;
+        }
+        .time-badge {
+            font-size: 14px;
+            font-weight: 700;
+            color: #222222;
+            margin-bottom: 6px;
+        }
+        .muted-step {
+            color: #717171;
+            font-size: 14px;
+            padding: 4px 0;
+        }
+        .destination-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            margin-top: 6px;
+        }
+        .destination-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        .destination-info {
+            padding: 14px;
+        }
+        .destination-title {
+            font-size: 16px;
+            color: #222222;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .destination-desc {
+            font-size: 13px;
+            color: #717171;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">이탈리아 가족 여행 일정</div>
+        <div class="chip-container">
+            <div class="chip active" onclick="switchDay(1)"><span class="chip-date">6/13 토</span><span class="chip-city">밀라노</span></div>
+            <div class="chip" onclick="switchDay(2)"><span class="chip-date">6/14 일</span><span class="chip-city">밀라노</span></div>
+            <div class="chip" onclick="switchDay(3)"><span class="chip-date">6/15 월</span><span class="chip-city">와이너리</span></div>
+            <div class="chip" onclick="switchDay(4)"><span class="chip-date">6/16 화</span><span class="chip-city">돌로/서</span></div>
+            <div class="chip" onclick="switchDay(5)"><span class="chip-date">6/17 수</span><span class="chip-city">돌로/서</span></div>
+            <div class="chip" onclick="switchDay(6)"><span class="chip-date">6/18 목</span><span class="chip-city">돌로/서</span></div>
+            <div class="chip" onclick="switchDay(7)"><span class="chip-date">6/19 금</span><span class="chip-city">돌로/서</span></div>
+            <div class="chip" onclick="switchDay(8)"><span class="chip-date">6/20 토</span><span class="chip-city">돌로/동</span></div>
+            <div class="chip" onclick="switchDay(9)"><span class="chip-date">6/21 일</span><span class="chip-city">돌로/동</span></div>
+            <div class="chip" onclick="switchDay(10)"><span class="chip-date">6/22 월</span><span class="chip-city">돌로/동</span></div>
+            <div class="chip" onclick="switchDay(11)"><span class="chip-date">6/23 화</span><span class="chip-city">베네치아</span></div>
+            <div class="chip" onclick="switchDay(12)"><span class="chip-date">6/24 수</span><span class="chip-city">베네치아</span></div>
+            <div class="chip" onclick="switchDay(13)"><span class="chip-date">6/25 목</span><span class="chip-city">베로나</span></div>
+            <div class="chip" onclick="switchDay(14)"><span class="chip-date">6/26 금</span><span class="chip-city">밀라노</span></div>
+            <div class="chip" onclick="switchDay(15)"><span class="chip-date">6/27 토</span><span class="chip-city">밀라노</span></div>
+        </div>
+    </header>
+
+    <main class="content-container">
+        <!-- 6/13 토 밀라노 -->
+        <div id="day1" class="day-section active">
+            <div class="day-summary">밀라노 도착 및 시내 관광</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">일정 미정</div>
+                    <div class="muted-step">상세 일정을 추가해주세요</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/14 일 밀라노 -->
+        <div id="day2" class="day-section">
+            <div class="day-summary">밀라노 관광</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">일정 미정</div>
+                    <div class="muted-step">상세 일정을 추가해주세요</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/15 월 와이너리 -->
+        <div id="day3" class="day-section">
+            <div class="day-summary">와이너리 투어</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">일정 미정</div>
+                    <div class="muted-step">상세 일정을 추가해주세요</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/16 화 돌로/서 -->
+        <div id="day4" class="day-section">
+            <div class="day-summary">서부 진입 및 카레차 호수 조망 (카스텔루토 숙소)</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 15:00</div>
+                    <div class="muted-step">출발지에서 돌로미티 방향으로 이동 (중간 점심 식사 및 볼차노 국도 주행)</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">15:00 - 16:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1549247290-76906a58390b?w=800" alt="카레차 호수">
+                        <div class="destination-info">
+                            <div class="destination-title">카레차 호수 (Lago di Carezza)</div>
+                            <div class="destination-desc">오후 3시 진입. 주차장과 인접한 평지 코스로 에메랄드빛 호수와 라테마르 산맥을 가볍게 산책하며 감상합니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">16:00 - 19:00</div>
+                    <div class="muted-step">카스텔루토 숙소로 이동 (차로 45분), 체크인 및 휴식</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">19:00 - 22:00</div>
+                    <div class="muted-step">숙소 근처 식당에서 저녁 식사 후 취침</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/17 수 돌로/서 -->
+        <div id="day5" class="day-section">
+            <div class="day-summary">광활한 알페 디 시우시 고원 투어</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 10:00</div>
+                    <div class="muted-step">숙소 조식 및 외출 준비</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">10:00 - 11:00</div>
+                    <div class="muted-step">시우시 승강장 이동 (차로 10분) 및 케이블카 탑승 고원 이동</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">11:00 - 15:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=800" alt="알페 디 시우시">
+                        <div class="destination-info">
+                            <div class="destination-title">알페 디 시우시 & 사쏘룽고</div>
+                            <div class="destination-desc">유럽 최대의 고원 초원을 산책하며 사쏘룽고의 웅장한 뷰를 감상합니다. 점심은 고원 내 산장에서 정취를 즐기며 식사합니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">15:00 - 17:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800" alt="피에 호수">
+                        <div class="destination-info">
+                            <div class="destination-title">피에 호수 (Lago di Fie)</div>
+                            <div class="destination-desc">하행 케이블카 복귀 후 차로 15분 이동. 오후의 잔잔하고 평화로운 숲속 호숫가를 조용히 거닐며 카페 타임을 가집니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">17:00 - 22:00</div>
+                    <div class="muted-step">숙소 복귀 후 휴식, 마을 내 식당에서 저녁 식사 및 취침</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/18 목 돌로/서 -->
+        <div id="day6" class="day-section">
+            <div class="day-summary">최고의 절경 세체다와 동화 같은 산타 막달레나</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 10:00</div>
+                    <div class="muted-step">숙소 조식 및 외출 준비</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">10:00 - 11:00</div>
+                    <div class="muted-step">오르티세이 이동 (차로 15분) 및 세체다 행 케이블카 탑승</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">11:00 - 14:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="세체다">
+                        <div class="destination-info">
+                            <div class="destination-title">세체다 전망대 (Seceda)</div>
+                            <div class="destination-desc">정상 역에 내리자마자 칼로 자른 듯 독특한 오들레 암봉이 펼쳐집니다. 정상 산장에서 경치를 보며 점심 식사를 즐깁니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">14:00 - 16:30</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1520106212299-d99c443e4568?w=800" alt="산타 막달레나">
+                        <div class="destination-info">
+                            <div class="destination-title">산타 막달레나 마을 (Santa Maddalena)</div>
+                            <div class="destination-desc">푸네스 계곡으로 이동 (차로 40분). 엽서와 달력에 단골로 등장하는 성 요한 성당 배경의 포인트를 차로 편하게 둘러봅니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">16:30 - 22:00</div>
+                    <div class="muted-step">숙소 복귀 (차로 35분) 후 휴식 및 마을 저녁 식사</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/19 금 돌로/서 -->
+        <div id="day7" class="day-section">
+            <div class="day-summary">고갯길 드라이브와 만년설 조망 (여유로운 시작)</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 10:15</div>
+                    <div class="muted-step">숙소 조식 및 전날 피로 회복을 위한 여유로운 휴식</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">10:15 - 11:45</div>
+                    <div class="muted-step">파쏘 셀라 고갯길 이동 (차로 40분) 후 거대 암벽 관람, 파쏘 포르도이 이동 (차로 25분)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">11:45 - 13:00</div>
+                    <div class="muted-step">파쏘 포르도이 인근 산장에서 점심 식사</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">13:00 - 14:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1548560781-a7a07d9d33db?w=800" alt="사스 포르도이">
+                        <div class="destination-info">
+                            <div class="destination-title">사스 포르도이 (Sass Pordoi)</div>
+                            <div class="destination-desc">케이블카를 타고 해발 2950m 돌로미티의 테라스에 오릅니다. 걷지 않고 황량하고 거대한 암석 파노라마를 관람합니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">14:00 - 16:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1519999482648-25049ddd37b1?w=800" alt="페다이아 호수">
+                        <div class="destination-info">
+                            <div class="destination-title">페다이아 호수 (Lago di Fedaia)</div>
+                            <div class="destination-desc">차로 30분 이동. 마르몰라다 만년설이 정면으로 조망되는 호숫가 카페에 앉아 차를 마시며 웅장한 빙하 뷰를 눈에 담습니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">16:00 - 22:00</div>
+                    <div class="muted-step">카스텔루토 복귀 (차로 70분), 이동 전 최종 짐 정리 및 저녁 식사</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/20 토 돌로/동 -->
+        <div id="day8" class="day-section">
+            <div class="day-summary">동부 이동 및 친퀘 토리 바위 탐방</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 10:00</div>
+                    <div class="muted-step">숙소 조식 및 체크아웃 후 차량 짐 적재</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">10:00 - 12:00</div>
+                    <div class="muted-step">친퀘 토리로 이동 (차로 75분). 오픈형 체어리프트를 타고 상쾌하게 고지대로 진입</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">12:00 - 14:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800" alt="친퀘 토리">
+                        <div class="destination-info">
+                            <div class="destination-title">친퀘 토리 (Cinque Torri)</div>
+                            <div class="destination-desc">리프트 하차장 바로 앞 스코이아톨리 산장 테라스에서 거대 바위 기둥을 정면으로 보며 점심을 먹고 주변 평지를 산책합니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">14:00 - 16:30</div>
+                    <div class="muted-step">하행 후 동부 숙소인 산 비토 디 카도레 이동 (차로 30분) 및 체크인, 짐 정리</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">16:30 - 22:00</div>
+                    <div class="muted-step">동부 숙소에서 충분히 휴식 후 근처 식당 저녁 식사</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/21 일 돌로/동 -->
+        <div id="day9" class="day-section">
+            <div class="day-summary">동부 핵심 트레 치메와 호수·패스 연계</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 10:00</div>
+                    <div class="muted-step">숙소 조식 및 외출 준비</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">10:00 - 11:00</div>
+                    <div class="muted-step">유료 도로를 타고 아우론초 산장 주차장으로 바로 이동 (차로 40분)</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">11:00 - 12:30</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1504829858481-bddec1ad098c?w=800" alt="트레 치메">
+                        <div class="destination-info">
+                            <div class="destination-title">트레 치메 디 라바레도</div>
+                            <div class="destination-desc">웅장한 세 개의 거대 암봉을 마주합니다. 아우론초 산장 앞마당과 평탄하게 이어지는 초반 완만한 코스 위주로 무리 없이 거닙니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">12:30 - 15:30</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1614713733615-56fa1487f5bb?w=800" alt="미수리나 호수">
+                        <div class="destination-info">
+                            <div class="destination-title">미수리나 호수 (Lago di Misurina)</div>
+                            <div class="destination-desc">차로 15분 하산. 호흡기 요양지로 유명한 맑은 호숫가 레스토랑에서 점심을 먹고 노천카페에서 여유롭게 휴식합니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">15:30 - 17:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1533587823334-31518fdf97aa?w=800" alt="파쏘 지아우">
+                        <div class="destination-info">
+                            <div class="destination-title">안토르노 호수 & 파쏘 지아우 드라이브</div>
+                            <div class="destination-desc">인근 안토르노 호수를 거쳐 파쏘 지아우(차로 40분)로 드라이브합니다. 고갯길 정상 주차장에서 내리자마자 사방의 탁 트인 대자연을 감상합니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">17:00 - 22:00</div>
+                    <div class="muted-step">산 비토 디 카도레 숙소 복귀 (차로 30분), 휴식 후 저녁 식사</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/22 월 돌로/동 -->
+        <div id="day10" class="day-section">
+            <div class="day-summary">돌로미티의 진주 호수와 코르티나 고공 전망 (여유로운 시작)</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 10:00</div>
+                    <div class="muted-step">숙소 조식 후 충분한 기상 휴식 및 외출 준비</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">10:00 - 11:00</div>
+                    <div class="muted-step">동부의 상징적인 명소 브라이에스 호수로 이동 (차로 60분)</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">11:00 - 12:30</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=800" alt="브라이에스 호수">
+                        <div class="destination-info">
+                            <div class="destination-title">브라이에스 호수 (Lago di Braies)</div>
+                            <div class="destination-desc">돌로미티의 진주라 불리는 곳입니다. 거울 같은 호수 수면에 비친 바위산 풍경을 따라 평탄하게 조성된 초입 산책로를 걷습니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">12:30 - 15:00</div>
+                    <div class="muted-step">코르티나 담페초 시내로 이동 (차로 50분), 시내 레스토랑에서 여유로운 점심 식사 및 보행자 거리 상점 구경</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">15:00 - 17:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1531210483974-4f8c1f33fd35?w=800" alt="토파나">
+                        <div class="destination-info">
+                            <div class="destination-title">토파나 케이블카 (Tofana)</div>
+                            <div class="destination-desc">시내 중심가에서 곧바로 탑승하는 화살 케이블카를 이용합니다. 힘들이지 않고 높이 올라가 코르티나 지역 전체를 발아래로 시원하게 굽어봅니다.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">17:00 - 22:00</div>
+                    <div class="muted-step">숙소 복귀 (차로 15분), 마지막 이동 짐 정리 및 여정 마무리 만찬</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/23 화 베네치아 -->
+        <div id="day11" class="day-section">
+            <div class="day-summary">직진 고속도로를 이용해 안전하게 베네치아로 이동</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">08:00 - 10:00</div>
+                    <div class="muted-step">숙소 조식 및 최종 체크아웃, 차량 캐리어 적재</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">10:00 - 12:00</div>
+                    <div class="muted-step">산 비토 디 카도레에서 남쪽 고속도로 진입 후 베네치아 방향 주행 (직진 위주의 편안한 경로, 차로 120분)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">12:00 - 14:00</div>
+                    <div class="muted-step">베네치아 약정 장소 도착 후 안전하게 렌터카 반납 및 본섬 진입 후 점심 식사</div>
+                </div>
+                <div class="timeline-item destination">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">14:00 - 22:00</div>
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1514890547357-a9ee2887ad8e?w=800" alt="베네치아">
+                        <div class="destination-info">
+                            <div class="destination-title">베네치아 오후 일정</div>
+                            <div class="destination-desc">본섬 숙소에 짐을 맡긴 뒤 오후 일정을 시작합니다. 잔잔한 운하 골목을 산책하고 수상버스에 탑승해 편하게 물 위의 도시를 경험합니다.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/24 수 베네치아 -->
+        <div id="day12" class="day-section">
+            <div class="day-summary">베네치아 관광</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">일정 미정</div>
+                    <div class="muted-step">상세 일정을 추가해주세요</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/25 목 베로나 -->
+        <div id="day13" class="day-section">
+            <div class="day-summary">베로나 이동 및 관광</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">일정 미정</div>
+                    <div class="muted-step">상세 일정을 추가해주세요</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/26 금 밀라노 -->
+        <div id="day14" class="day-section">
+            <div class="day-summary">밀라노 복귀 및 쇼핑</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">일정 미정</div>
+                    <div class="muted-step">상세 일정을 추가해주세요</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6/27 토 밀라노 -->
+        <div id="day15" class="day-section">
+            <div class="day-summary">공항 이동 및 귀국</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="time-badge">일정 미정</div>
+                    <div class="muted-step">상세 일정을 추가해주세요</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function switchDay(dayNumber) {
+            // 모든 칩에서 active 제거 및 선택된 칩에 추가
+            const chips = document.querySelectorAll('.chip');
+            chips.forEach((chip, index) => {
+                if (index === (dayNumber - 1)) {
+                    chip.classList.add('active');
+                    // 선택된 칩이 화면 밖으로 가려지지 않도록 자동 스크롤
+                    chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+
+            // 모든 데이 섹션 숨김 및 선택된 섹션 노출
+            const sections = document.querySelectorAll('.day-section');
+            sections.forEach((section, index) => {
+                if (index === (dayNumber - 1)) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+
+            // 페이지 상단으로 스크롤 이동
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
