@@ -618,7 +618,13 @@
     </main>
 
     <script>
+        const TOTAL_DAYS = 15;
+        let currentDay = 1;
+
         function switchDay(dayNumber) {
+            if (dayNumber < 1 || dayNumber > TOTAL_DAYS) return;
+            currentDay = dayNumber;
+
             // 모든 칩에서 active 제거 및 선택된 칩에 추가
             const chips = document.querySelectorAll('.chip');
             chips.forEach((chip, index) => {
@@ -644,6 +650,44 @@
             // 페이지 상단으로 스크롤 이동
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // 모바일 좌우 스와이프로 날짜 이동
+        (function setupSwipe() {
+            const swipeArea = document.querySelector('main.content-container');
+            if (!swipeArea) return;
+
+            let startX = 0;
+            let startY = 0;
+            let tracking = false;
+
+            const THRESHOLD = 50; // 최소 이동 거리(px)
+            const RATIO = 1.2;    // 수평이 수직보다 이만큼 더 커야 스와이프로 인정
+
+            swipeArea.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) { tracking = false; return; }
+                const t = e.touches[0];
+                startX = t.clientX;
+                startY = t.clientY;
+                tracking = true;
+            }, { passive: true });
+
+            swipeArea.addEventListener('touchend', (e) => {
+                if (!tracking) return;
+                tracking = false;
+                const t = e.changedTouches[0];
+                const dx = t.clientX - startX;
+                const dy = t.clientY - startY;
+                if (Math.abs(dx) < THRESHOLD) return;
+                if (Math.abs(dx) < Math.abs(dy) * RATIO) return; // 세로 스크롤로 판단
+                if (dx < 0) {
+                    switchDay(currentDay + 1); // 왼쪽으로 스와이프 → 다음 날
+                } else {
+                    switchDay(currentDay - 1); // 오른쪽으로 스와이프 → 이전 날
+                }
+            }, { passive: true });
+
+            swipeArea.addEventListener('touchcancel', () => { tracking = false; }, { passive: true });
+        })();
     </script>
 </body>
 </html>
